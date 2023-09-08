@@ -1,0 +1,38 @@
+#!/bin/bash
+#SBATCH --time=120:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --partition=cpuq
+#SBATCH --job-name=crispr-screen_master
+#SBATCH --mem=256MB
+#SBATCH --mail-type=END
+#SBATCH --output=%x_%j.log
+
+echo; echo "Starting slurm job..."
+echo "PWD:  $(pwd)"
+echo "HOST: $(hostname)"
+echo "DATE: $(date)"; echo
+
+# >>> conda initialize >>>
+__conda_setup="$('/home/matteo.bonfanti/anaconda/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+eval "$__conda_setup"
+unset __conda_setup
+# <<< conda initialize <<<
+
+# load singularity, java and nextflow
+module load singularity/3.8.5
+module load openjdk/16.0.2
+conda activate nextflow
+
+nextflow run crispr-screen -resume -ansi-log false \
+   --adapter_seq "GTGGAAAGGACGAAACACCG" --guide_ref "path_to_guide_ref.csv" \
+   --normalization "control" --control_guides "path_to_guide_lis.txt"  \
+   --csv wg_screen.csv --screen_name "wg_screen" \
+   --design_matrix "matrix1.txt,matrix2.txt" \
+   --sample_to_remove "sample1,sample2" 
+
+echo; echo "Terminating slurm job..."
+echo "DATE: $(date)"; echo
+exit
+
+
