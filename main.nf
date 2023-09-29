@@ -1,4 +1,3 @@
-
 /*
  * pipeline input parameters
  */
@@ -191,7 +190,7 @@ process MAGECK_MLE {
     def ctrl_guides_opt = (params.normalization == "control") ? "--control-sgrna ${ control_guides }" : ""
     """
     mageck mle -k ${ counts } -d ${ design_matrix } \
-               -n ${ design_id } ${ ctrl_guides_opt }
+               -n ${ design_id } --norm-method none ${ ctrl_guides_opt }
     """
 }
 
