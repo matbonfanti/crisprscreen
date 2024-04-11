@@ -62,17 +62,18 @@ process TRIM_ADAPTER {
     container "https://depot.galaxyproject.org/singularity/cutadapt:4.3--py39hbf8eff0_0"
 
     input:
-    tuple val(sample_id), path(fastq_file)
+    tuple val(sample_id), path(fastq_files)
 
     output:
-    tuple val(sample_id), path("${fastq_file.getSimpleName()}_trim.fastq.gz"), emit: trimmed_fastq
+    tuple val(sample_id), path("${sample_id}_trim.fastq.gz"), emit: trimmed_fastq
 
     script:
     """
-       cutadapt -e 0.25 -O 15 -l 20 \
-            -g ${params.adapter_seq} \
-            -o ${fastq_file.getSimpleName()}_trim.fastq.gz \
-            ${fastq_file}
+        zcat $fastq_files | \\
+        cutadapt -e 0.25 -O 15 -l 20 \\
+            -g ${params.adapter_seq} \\
+            -o ${sample_id}_trim.fastq.gz \\
+            -
     """
 }
 
